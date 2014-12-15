@@ -16,10 +16,10 @@ import akka.io.IO
 import spray.can.Http
 import akka.util.Timeout
 
-class Test(serverAddress: String, timeoutPeriod: Timeout)(implicit system: ActorSystem) extends Actor {
+class Test(serverAddress: String, pingInterval: Int, timeoutPeriod: Timeout)(implicit system: ActorSystem) extends Actor {
 
   import system.dispatcher
-  val interval: Int = 100
+  val interval: Int = pingInterval
   implicit val timeout: Timeout = timeoutPeriod
 
   def receive = {

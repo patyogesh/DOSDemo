@@ -16,5 +16,5 @@ class Constants {
   val followers = Array(8, 7, 7, 5, 5, 3, 3, 1, 1, 1)
   
   //Spray Timeout
-  val TIMEOUT: Timeout = 10.seconds 
+  val TIMEOUT: Timeout = 30.seconds 
 }

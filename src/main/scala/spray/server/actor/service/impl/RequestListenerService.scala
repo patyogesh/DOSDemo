@@ -54,7 +54,8 @@ class RequestListenerService(name: String, localAddress: String, localAkkaMessag
       }
       //send request to akka server
       val akkaServer = context.actorSelection(akkaServerPath + "UserRegistrationRouter")
-      akkaServer ! RegisterUsers(uuid, ip, clients, selfPath, followers, sampleSize, peakActorName, peakActorFollowersCount)
+      //akkaServer ! RegisterUsers(uuid, ip, clients, selfPath, followers, sampleSize, peakActorName, peakActorFollowersCount)
+      val future = akkaServer ! RegisterUsers(uuid, ip, clients, selfPath, followers, sampleSize, peakActorName, peakActorFollowersCount)
 
     case Start(requestUUID: String) =>
       requestMap.remove(requestUUID).get ! HttpResponse()
