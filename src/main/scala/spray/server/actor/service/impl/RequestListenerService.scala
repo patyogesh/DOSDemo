@@ -62,6 +62,7 @@ class RequestListenerService(name: String, localAddress: String, localAkkaMessag
     //TWEET SERVICES
     //POST Update
     case HttpRequest(POST, Uri.Path(path), header, entity, protocol) if path startsWith "/tweet/update" =>
+      println("Tweet")
       val args: Array[String] = path.split("/")
       val service = args(1)
       val endPoint = "POST" + args(2)
