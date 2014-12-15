@@ -22,7 +22,10 @@ object Main {
     val akkaServerIP = args(0)
     val localAddress: String = java.net.InetAddress.getLocalHost.getHostAddress()
     val constants = new Constants()
-
+    
+    val sprayServerPort: Int = constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES
+    val numberOfPorts: Int = constants.NUMBER_OF_PORTS_FOR_SPRAY_SERVER
+    
     val cores: Int = Runtime.getRuntime().availableProcessors();
 
     val requestMap: concurrent.Map[String, ActorRef] = new ConcurrentHashMap().asScala
@@ -50,6 +53,6 @@ object Main {
     //handler = system.actorOf(Props(new RequestListenerRouter(2 * cores, "RequestListenerRouter", localAddress, constants.SPRAY_SERVER_PORT_FOR_AKKA_MESSAGES, akkaServerIP, constants.AKKA_SERVER_PORT, constants.followers, requestMap)), name = "RequestListenerRouter")
     //IO(Http) ! Http.Bind(handler, interface = localAddress, port = constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES)
     
-    val controller: ActorRef = system.actorOf(Props(new FailureHandlerController("RequestListener", localAddress, constants.SPRAY_SERVER_PORT_FOR_AKKA_MESSAGES, akkaServerIP, constants.AKKA_SERVER_PORT, constants.followers, requestMap, constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES)), "Controller")
+    val controller: ActorRef = system.actorOf(Props(new FailureHandlerController(localAddress, sprayServerPort, numberOfPorts, constants.SPRAY_SERVER_PORT_FOR_AKKA_MESSAGES, akkaServerIP, constants.AKKA_SERVER_PORT, constants.followers, requestMap, constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES)), "Controller")
   }
 }

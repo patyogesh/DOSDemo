@@ -27,7 +27,11 @@ import akka.util.Timeout
 object Main {
 
   def main(args: Array[String]) {
+    val constants = new Constants()
+    
     val hostAddress: String = args(0)
+    val sprayServerPort = constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES
+    val numberOfPorts = constants.NUMBER_OF_PORTS_FOR_SPRAY_SERVER
 
     //Cranking factors from input
     val timeMultiplier: Double = args(1).toDouble
@@ -48,9 +52,9 @@ object Main {
     clients = (clients * userCountMultiplier).toInt
 
     val localAddress: String = java.net.InetAddress.getLocalHost.getHostAddress()
-    val constants = new Constants()
+    
     val sprayRequestTimeout: Timeout = constants.TIMEOUT
-    val serverAddress: String = hostAddress + ":" + constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES
+    //val serverAddress: String = hostAddress + ":" + constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES
 
     //Scale time
     val offset = (24 * 3600) / (clients * timeMultiplier)
@@ -81,20 +85,20 @@ object Main {
       peakActorFollowersCount = args(6).toInt
       //val selfPath = "akka.tcp://Project4aClient@" + localAddress + ":" + constants.AKKA_CLIENT_PORT + "/user/PeakActor"
       peakActorName = "PeakActor"
-      peakActor = system.actorOf(Props(new SprayPeakActor(startTime, interval, serverAddress, "PeakActor@" + localAddress, constants.TIMEOUT)), peakActorName)
+      peakActor = system.actorOf(Props(new SprayPeakActor(startTime, interval, hostAddress + ":" + sprayServerPort, "PeakActor@" + localAddress, constants.TIMEOUT)), peakActorName)
     } catch {
       case ex: java.lang.ArrayIndexOutOfBoundsException => //Optional arguments for peak load. 
     }
 
     //#This class instantiates the user actors on client side and starts them when registration on server side is complete.
-    val clientActorFactory = system.actorOf(Props(new SprayClientActorFactory(clients, serverAddress, followers, sampleSize, numberOfTweetsPerDay, offset, localAddress, timeMultiplier, peakActor, sprayRequestTimeout)), "ClientActorFactory")
+    val clientActorFactory = system.actorOf(Props(new SprayClientActorFactory(clients, hostAddress, sprayServerPort, numberOfPorts, followers, sampleSize, numberOfTweetsPerDay, offset, localAddress, timeMultiplier, peakActor, sprayRequestTimeout)), "ClientActorFactory")
 
     import system.dispatcher
     implicit val timeout: Timeout = constants.TIMEOUT
     
     println("Registering Clients on server")
     for {
-      response <- IO(Http).ask(HttpRequest(method = POST, uri = Uri(s"http://$serverAddress/userregistration"), entity = HttpEntity(`application/json`, """{ "ip" : """" + localAddress.split(":")(0) + """" , "clients" : """" + clients + """" , "sampleSize" : """" + sampleSize + """" , "peakActorName" : """" + peakActorName + """" , "peakActorFollowersCount" : """" + peakActorFollowersCount + """"}"""))).mapTo[HttpResponse]
+      response <- IO(Http).ask(HttpRequest(method = POST, uri = Uri(s"http://hostAddress:$sprayServerPort/userregistration"), entity = HttpEntity(`application/json`, """{ "ip" : """" + localAddress.split(":")(0) + """" , "clients" : """" + clients + """" , "sampleSize" : """" + sampleSize + """" , "peakActorName" : """" + peakActorName + """" , "peakActorFollowersCount" : """" + peakActorFollowersCount + """"}"""))).mapTo[HttpResponse]
       _ <- IO(Http) ? Http.CloseAll
     } yield {
       //if (response.status.toString.equalsIgnoreCase("200"))

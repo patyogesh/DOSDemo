@@ -21,12 +21,14 @@ class Test(serverAddress: String, pingInterval: Int, timeoutPeriod: Timeout)(imp
   import system.dispatcher
   val interval: Int = pingInterval
   implicit val timeout: Timeout = timeoutPeriod
+  var counter: Int = 0
 
   def receive = {
     case Start =>
       val tweet = context.system.scheduler.schedule(0 milliseconds, interval milliseconds, self, TweetToServer)
     case TweetToServer =>
-      println("Ping")
+      println("Ping : " + counter )
+      counter += 1
       for {
         response <- IO(Http).ask(HttpRequest(method = POST, uri = Uri(s"http://$serverAddress/ping"), entity = HttpEntity(`application/json`, """{ "text" : "Hello!" }"""))).mapTo[HttpResponse]
         _ <- IO(Http) ? Http.CloseAll

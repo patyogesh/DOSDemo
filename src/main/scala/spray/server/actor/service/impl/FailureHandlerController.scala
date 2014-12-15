@@ -9,17 +9,19 @@ import akka.io.IO
 import scala.collection.mutable.Map
 import akka.actor.ActorSystem
 
-class FailureHandlerController(name: String, localAddress: String, localAkkaMessagePort: Int, akkaServerAddress: String, akkaServerPort: Int, followers: Array[Int], requestMap: Map[String, ActorRef], handlerBindingPort: Int)(implicit val system: ActorSystem) extends Actor {
-  
-  var  handler: ActorRef = context.system.actorOf(Props(new RequestListenerService(name, localAddress, localAkkaMessagePort, akkaServerAddress, akkaServerPort, followers, requestMap)), name = name)
-  context watch handler
-  IO(Http) ! Http.Bind(handler, interface = localAddress, port = handlerBindingPort)
-  
+class FailureHandlerController(localAddress: String, sprayServerPort: Int, numberOfPorts: Int, localAkkaMessagePort: Int, akkaServerAddress: String, akkaServerPort: Int, followers: Array[Int], requestMap: Map[String, ActorRef], handlerBindingPort: Int)(implicit val system: ActorSystem) extends Actor {
+
+  var handler: ActorRef = null
+  for (i <- sprayServerPort to (sprayServerPort + numberOfPorts - 1)) {
+    handler = context.system.actorOf(Props(new RequestListenerService(i.toString, localAddress, localAkkaMessagePort, akkaServerAddress, akkaServerPort, followers, requestMap)), name = i.toString)
+    context watch handler
+    IO(Http) ! Http.Bind(handler, interface = localAddress, port = i)
+  }
   def receive = {
     case Terminated(a) =>
-      println("Failed")
-      val handler: ActorRef = context.system.actorOf(Props(new RequestListenerService(name, localAddress, localAkkaMessagePort, akkaServerAddress, akkaServerPort, followers, requestMap)), name = name)
-      IO(Http) ! Http.Bind(handler, interface = localAddress, port = handlerBindingPort)
+      println("Failed : " + a.toString)
+    //val handler: ActorRef = context.system.actorOf(Props(new RequestListenerService(name, localAddress, localAkkaMessagePort, akkaServerAddress, akkaServerPort, followers, requestMap)), name = name)
+    //IO(Http) ! Http.Bind(handler, interface = localAddress, port = handlerBindingPort)
     case a =>
       println("Unknown message received at FailureHandler Controller on spray server : " + a.toString)
   }
