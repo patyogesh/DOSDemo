@@ -53,6 +53,6 @@ object Main {
     //handler = system.actorOf(Props(new RequestListenerRouter(2 * cores, "RequestListenerRouter", localAddress, constants.SPRAY_SERVER_PORT_FOR_AKKA_MESSAGES, akkaServerIP, constants.AKKA_SERVER_PORT, constants.followers, requestMap)), name = "RequestListenerRouter")
     //IO(Http) ! Http.Bind(handler, interface = localAddress, port = constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES)
     
-    val controller: ActorRef = system.actorOf(Props(new FailureHandlerController(localAddress, sprayServerPort, numberOfPorts, constants.SPRAY_SERVER_PORT_FOR_AKKA_MESSAGES, akkaServerIP, constants.AKKA_SERVER_PORT, constants.followers, requestMap, constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES)), "Controller")
+    val controller: ActorRef = system.actorOf(Props(new FailureHandlerController(cores, localAddress, sprayServerPort, numberOfPorts, constants.SPRAY_SERVER_PORT_FOR_AKKA_MESSAGES, akkaServerIP, constants.AKKA_SERVER_PORT, constants.followers, requestMap, constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES)), "Controller")
   }
 }
