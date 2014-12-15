@@ -40,8 +40,11 @@ case class Print() extends Messages
 //#Load Monitor Messages
 case class MeasureLoad() extends Messages
 case class InformLoad() extends Messages
+case class InformRequestCount() extends Messages
 case class RegisterTweetLoad(load: Int) extends Messages
 case class RegisterTimelineLoad(load: Int) extends Messages
+case class RegisterTweetRequestCount(count: Int) extends Messages
+case class RegisterTimelineRequestCount(count: Int) extends Messages
 case class PrintLoad() extends Messages
 case class RegisterService(service: ActorRef) extends Messages
 case class UserCount(count: Int) extends Messages

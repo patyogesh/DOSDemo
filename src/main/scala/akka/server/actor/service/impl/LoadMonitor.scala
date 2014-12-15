@@ -1,10 +1,13 @@
 package main.scala.akka.server.actor.service.impl
 
 import scala.concurrent.duration.DurationInt
+
 import akka.actor.Actor
 import main.scala.common.PrintLoad
 import main.scala.common.RegisterTimelineLoad
+import main.scala.common.RegisterTimelineRequestCount
 import main.scala.common.RegisterTweetLoad
+import main.scala.common.RegisterTweetRequestCount
 import main.scala.common.UserCount
 
 //#This is the load monitor of tweeter server and measures all load on server.
@@ -15,6 +18,8 @@ class LoadMonitor(updateTimeout: Int) extends Actor {
   var userCount: Int = 0
   var serverTweetLoad: Int = 0
   var serverTimelineLoad: Int = 0
+  var serverTweetRequestCount: Int = 0
+  var serverTimelineRequestCount: Int = 0
   val printLoad = context.system.scheduler.schedule(0 milliseconds, updateTimeout milliseconds, self, PrintLoad)
 
   def receive = {
@@ -22,10 +27,16 @@ class LoadMonitor(updateTimeout: Int) extends Actor {
       serverTweetLoad += load
     case RegisterTimelineLoad(load) =>
       serverTimelineLoad += load
+    case RegisterTweetRequestCount(count) =>
+      serverTweetRequestCount += count
+    case RegisterTimelineRequestCount(count) =>
+      serverTimelineRequestCount += count
     case PrintLoad =>
-      println("Total Server Load : " + (serverTweetLoad + serverTimelineLoad) + " . Server Tweets Load : " + serverTweetLoad + " . Server Timeline Load : " + serverTimelineLoad + " . Users Registered : " + userCount)
+      println("Total Server Load : " + (serverTweetLoad + serverTimelineLoad) + " . Server Tweets Load : " + serverTweetLoad + " . Server Timeline Load : " + serverTimelineLoad + " . Total Request Count : " + (serverTweetRequestCount + serverTimelineRequestCount) + " . Users Registered : " + userCount)
       serverTweetLoad = 0
       serverTimelineLoad = 0
+      serverTweetRequestCount = 0
+      serverTimelineRequestCount = 0
     case UserCount(count: Int) =>
       userCount += count
     case _ =>

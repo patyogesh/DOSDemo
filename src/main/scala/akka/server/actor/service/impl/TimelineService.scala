@@ -3,18 +3,29 @@ package main.scala.akka.server.actor.service.impl
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.Map
 import scala.concurrent.duration.DurationInt
+
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.ActorSelection.toScala
 import akka.actor.actorRef2Scala
-import main.scala.common._
+import main.scala.common.AkkaRequest
+import main.scala.common.InformLoad
+import main.scala.common.InformRequestCount
+import main.scala.common.LoadHomeTimelineResp
+import main.scala.common.LoadUserTimelineResp
+import main.scala.common.RegisterTimelineLoad
+import main.scala.common.RegisterTweetRequestCount
+import main.scala.common.Tweet
+import main.scala.common.UserProfile
 
 //#This serves any timeline service request coming from any user.
 class TimelineService(loadMonitor: ActorRef, userProfilesMap: Map[String, UserProfile], tweetsMap: Map[String, Tweet]) extends Actor {
   import context.dispatcher
 
   var load: Int = 0
+  var requestCount: Int = 0
   val updateLoad = context.system.scheduler.schedule(0 milliseconds, 2000 milliseconds, self, InformLoad)
+  val updateRequestCount = context.system.scheduler.schedule(0 milliseconds, 2000 milliseconds, self, InformRequestCount)
 
   val numberOfTweetsPerRequest = 20
 
@@ -29,6 +40,9 @@ class TimelineService(loadMonitor: ActorRef, userProfilesMap: Map[String, UserPr
     case InformLoad =>
       loadMonitor ! RegisterTimelineLoad(load)
       load = 0
+    case InformRequestCount =>
+      loadMonitor ! RegisterTweetRequestCount(requestCount)
+      requestCount = 0
     case _ => println("Unknown end point called form Tweet Service");
   }
 
@@ -47,6 +61,7 @@ class TimelineService(loadMonitor: ActorRef, userProfilesMap: Map[String, UserPr
         i += 1
       }
       load += tweets.size
+      requestCount += 1
       val client = context.actorSelection(requestActorPath)
       client ! new LoadHomeTimelineResp(requestUUID, tweets)
     } catch {
@@ -65,6 +80,7 @@ class TimelineService(loadMonitor: ActorRef, userProfilesMap: Map[String, UserPr
         i += 1
       }
       load += tweets.size
+      requestCount += 1
       val client = context.actorSelection(requestActorPath)
       client ! new LoadUserTimelineResp(requestUUID, tweets)
     } catch {

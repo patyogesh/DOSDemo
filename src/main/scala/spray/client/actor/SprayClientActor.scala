@@ -29,10 +29,10 @@ class SprayClientActor(serverAddress: String, followers: Int, tweetsPerDay: Int,
     case Start =>
       val tweetTimeout = ((24 * 3600) / (tweetsPerDay * timeMultiplier))
       val tweet = context.system.scheduler.schedule((offset / tweetsPerDay) * 1000 milliseconds, tweetTimeout * 1000 milliseconds, self, TweetToServer)
-      //val homeTimelineTimeout = ((24 * 3600) / (4 * timeMultiplier))
-      //val homeTimeline = context.system.scheduler.schedule((offset / 4) * 1000 milliseconds, homeTimelineTimeout * 1000 milliseconds, self, LoadHomeTimelineReq)
-      //val userTimelineTimeout = ((24 * 3600) / (1 * timeMultiplier))
-      //val userTimeline = context.system.scheduler.schedule((offset / 1) * 1000 milliseconds, userTimelineTimeout * 1000 milliseconds, self, LoadUserTimelineReq)
+      val homeTimelineTimeout = ((24 * 3600) / (4 * timeMultiplier))
+      val homeTimeline = context.system.scheduler.schedule((offset / 4) * 1000 milliseconds, homeTimelineTimeout * 1000 milliseconds, self, LoadHomeTimelineReq)
+      val userTimelineTimeout = ((24 * 3600) / (1 * timeMultiplier))
+      val userTimeline = context.system.scheduler.schedule((offset / 1) * 1000 milliseconds, userTimelineTimeout * 1000 milliseconds, self, LoadUserTimelineReq)
     case TweetToServer =>
       println("Tweet")
       for {

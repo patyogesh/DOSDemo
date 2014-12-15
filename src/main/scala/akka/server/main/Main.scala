@@ -18,7 +18,6 @@ import main.scala.common.UserProfile
 //#This class is the main class to launch the tweeter server for this project. 
 object Main {
   def main(args: Array[String]) {
-    println("YOGESH BHAI")
     val constants = new Constants()
 
     val hostAddress: String = java.net.InetAddress.getLocalHost.getHostAddress()

@@ -4,14 +4,7 @@ import scala.collection.mutable.Map
 import scala.concurrent.duration.DurationDouble
 import akka.actor.Actor
 import akka.actor.ActorSelection.toScala
-import main.scala.common.AkkaRequest
-import main.scala.common.Constants
-import main.scala.common.LoadHomeTimelineReq
-import main.scala.common.LoadHomeTimelineResp
-import main.scala.common.LoadUserTimelineReq
-import main.scala.common.LoadUserTimelineResp
-import main.scala.common.Start
-import main.scala.common.TweetToServer
+import main.scala.common._
 
 //#This class simulates normal user of tweeter through an actor. 
 class ClientActor(serverAddress: String, followers: Int, tweetsPerDay: Int, offset: Double, name: String, totalClients: Int, timeMultiplier: Double) extends Actor {
@@ -36,6 +29,8 @@ class ClientActor(serverAddress: String, followers: Int, tweetsPerDay: Int, offs
       val server = context.actorSelection(servicePath)
       val uuid = java.util.UUID.randomUUID().toString()
       server ! new AkkaRequest(uuid, selfPath + name, "PostUpdate", name, "", getRandomText)
+    case PostUpdateResponse(requestUUID: String) =>
+      //Trash response message
     case LoadHomeTimelineReq =>
       val servicePath = serverAddress + "/TimelineServiceRouter"
       val server = context.actorSelection(servicePath)
