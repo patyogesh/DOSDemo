@@ -1,12 +1,9 @@
 package main.scala.spray.server.main
 
 import java.util.concurrent.ConcurrentHashMap
-
 import scala.collection.concurrent
 import scala.collection.convert.decorateAsScala.mapAsScalaConcurrentMapConverter
-
 import com.typesafe.config.ConfigFactory
-
 import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
@@ -17,6 +14,7 @@ import main.scala.common.Constants
 import main.scala.spray.server.actor.service.router.RequestListenerRouter
 import spray.can.Http
 import main.scala.spray.server.actor.service.impl.RequestListenerService
+import main.scala.spray.server.actor.service.impl.FailureHandlerController
 
 object Main {
 
@@ -47,9 +45,11 @@ object Main {
     implicit val timeout: Timeout = constants.TIMEOUT
 
     // the handler actor replies to incoming HttpRequests
-    var handler: ActorRef = null
-    handler = system.actorOf(Props(new RequestListenerService("RequestListener", localAddress, constants.SPRAY_SERVER_PORT_FOR_AKKA_MESSAGES, akkaServerIP, constants.AKKA_SERVER_PORT, constants.followers, requestMap)), name = "RequestListener")
+    //var handler: ActorRef = null
+    //handler = system.actorOf(Props(new RequestListenerService("RequestListener", localAddress, constants.SPRAY_SERVER_PORT_FOR_AKKA_MESSAGES, akkaServerIP, constants.AKKA_SERVER_PORT, constants.followers, requestMap)), name = "RequestListener")
     //handler = system.actorOf(Props(new RequestListenerRouter(2 * cores, "RequestListenerRouter", localAddress, constants.SPRAY_SERVER_PORT_FOR_AKKA_MESSAGES, akkaServerIP, constants.AKKA_SERVER_PORT, constants.followers, requestMap)), name = "RequestListenerRouter")
-    IO(Http) ! Http.Bind(handler, interface = localAddress, port = constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES)
+    //IO(Http) ! Http.Bind(handler, interface = localAddress, port = constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES)
+    
+    val controller: ActorRef = system.actorOf(Props(new FailureHandlerController("RequestListener", localAddress, constants.SPRAY_SERVER_PORT_FOR_AKKA_MESSAGES, akkaServerIP, constants.AKKA_SERVER_PORT, constants.followers, requestMap, constants.SPRAY_SERVER_PORT_FOR_HTTP_MESSAGES)), "Controller")
   }
 }
