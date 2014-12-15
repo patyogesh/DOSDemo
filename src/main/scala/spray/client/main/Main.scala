@@ -96,9 +96,9 @@ object Main {
     import system.dispatcher
     implicit val timeout: Timeout = constants.TIMEOUT
     
-    println("Registering Clients on server")
+    println("Registering Clients on server : " + hostAddress + ":" + sprayServerPort)
     for {
-      response <- IO(Http).ask(HttpRequest(method = POST, uri = Uri(s"http://hostAddress:$sprayServerPort/userregistration"), entity = HttpEntity(`application/json`, """{ "ip" : """" + localAddress.split(":")(0) + """" , "clients" : """" + clients + """" , "sampleSize" : """" + sampleSize + """" , "peakActorName" : """" + peakActorName + """" , "peakActorFollowersCount" : """" + peakActorFollowersCount + """"}"""))).mapTo[HttpResponse]
+      response <- IO(Http).ask(HttpRequest(method = POST, uri = Uri(s"http://$hostAddress:$sprayServerPort/userregistration"), entity = HttpEntity(`application/json`, """{ "ip" : """" + localAddress.split(":")(0) + """" , "clients" : """" + clients + """" , "sampleSize" : """" + sampleSize + """" , "peakActorName" : """" + peakActorName + """" , "peakActorFollowersCount" : """" + peakActorFollowersCount + """"}"""))).mapTo[HttpResponse]
       _ <- IO(Http) ? Http.CloseAll
     } yield {
       //if (response.status.toString.equalsIgnoreCase("200"))
