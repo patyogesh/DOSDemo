@@ -50,7 +50,7 @@ case class RegisterService(service: ActorRef) extends Messages
 case class UserCount(count: Int) extends Messages
 
 //#User Registration Messages
-case class RegisterUser(userName: String) extends Messages
+case class RegisterUser(requestUUID: String, userName: String, selfPath: String) extends Messages
 case class RegisterUsers(requestUUID: String, ip: String, clients: Int, clientFactoryPath: String, followers: Array[Int], sampleSize: Int, peakActorName: String, peakActorFollowersCount: Int) extends Messages
 case class RegistrationComplete(requestUUID: String) extends Messages
 case class UpdateRegisteredUserCount() extends Messages
@@ -65,4 +65,5 @@ case class LoadHomeTimelineResp(requestUUID: String, tweets: Map[String, String]
 case class LoadUserTimelineReq() extends Messages
 case class LoadUserTimelineResp(requestUUID: String, tweets: Map[String, String]) extends Messages
 
+case class Complete(uuid: String) extends Messages
 case class Start(uuid: String) extends Messages

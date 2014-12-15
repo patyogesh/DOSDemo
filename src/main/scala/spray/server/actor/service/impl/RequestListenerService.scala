@@ -34,6 +34,26 @@ class RequestListenerService(name: String, localAddress: String, localAkkaMessag
       sender ! HttpResponse(entity = HttpEntity(`application/json`, """{ received : """ + value + """}"""))
 
     //USER REGISTRATION
+      //Register single user to akka server
+    case HttpRequest(POST, Uri.Path(path), header, entity, protocol) if path startsWith "/registeruser" =>
+      val args: Array[String] = path.split("/")
+      val userName = args(2)
+      var done = false
+      var uuid: String = ""
+      while (!done) {
+        uuid = java.util.UUID.randomUUID().toString()
+        if (requestMap.get(uuid) == None) {
+          requestMap += uuid -> sender
+          done = true
+        }
+      }
+      //send request to akka server
+      val akkaServer = context.actorSelection(akkaServerPath + "UserRegistrationRouter")
+      akkaServer ! RegisterUser(uuid, userName, selfPath)
+
+    case Complete(requestUUID: String) =>
+      requestMap.remove(requestUUID).get ! HttpResponse()
+      
     //Register multiple users to akka server
     case HttpRequest(POST, Uri.Path(path), header, entity, protocol) if path startsWith "/userregistration" =>
       val payloadMap = entity.asString.asJson.convertTo[scala.collection.immutable.Map[String, String]]
@@ -54,8 +74,7 @@ class RequestListenerService(name: String, localAddress: String, localAkkaMessag
       }
       //send request to akka server
       val akkaServer = context.actorSelection(akkaServerPath + "UserRegistrationRouter")
-      //akkaServer ! RegisterUsers(uuid, ip, clients, selfPath, followers, sampleSize, peakActorName, peakActorFollowersCount)
-      val future = akkaServer ! RegisterUsers(uuid, ip, clients, selfPath, followers, sampleSize, peakActorName, peakActorFollowersCount)
+      akkaServer ! RegisterUsers(uuid, ip, clients, selfPath, followers, sampleSize, peakActorName, peakActorFollowersCount)
 
     case Start(requestUUID: String) =>
       requestMap.remove(requestUUID).get ! HttpResponse()
