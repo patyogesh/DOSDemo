@@ -14,8 +14,8 @@ class FailureHandlerController(cores: Int, localAddress: String, sprayServerPort
 
   var handler: ActorRef = null
   for (i <- sprayServerPort to (sprayServerPort + numberOfPorts - 1)) {
-    //handler = context.system.actorOf(Props(new RequestListenerService(i.toString, localAddress, localAkkaMessagePort, akkaServerAddress, akkaServerPort, followers, requestMap)), name = i.toString)
-    handler = system.actorOf(Props(new RequestListenerRouter(2 * cores, i.toString, localAddress, localAkkaMessagePort, akkaServerAddress, akkaServerPort, followers, requestMap)), name = i.toString)
+    handler = context.system.actorOf(Props(new RequestListenerService(i.toString, localAddress, localAkkaMessagePort, akkaServerAddress, akkaServerPort, followers, requestMap)), name = i.toString)
+    //handler = system.actorOf(Props(new RequestListenerRouter(2 * cores, i.toString, localAddress, localAkkaMessagePort, akkaServerAddress, akkaServerPort, followers, requestMap)), name = i.toString)
     context watch handler
     IO(Http) ! Http.Bind(handler, interface = localAddress, port = i)
   }
