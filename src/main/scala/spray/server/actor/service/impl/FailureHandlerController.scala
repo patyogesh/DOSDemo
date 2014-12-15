@@ -17,6 +17,7 @@ class FailureHandlerController(name: String, localAddress: String, localAkkaMess
   
   def receive = {
     case Terminated(a) =>
+      println("Failed")
       val handler: ActorRef = context.system.actorOf(Props(new RequestListenerService(name, localAddress, localAkkaMessagePort, akkaServerAddress, akkaServerPort, followers, requestMap)), name = name)
       IO(Http) ! Http.Bind(handler, interface = localAddress, port = handlerBindingPort)
     case a =>
