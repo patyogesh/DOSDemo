@@ -34,7 +34,7 @@ class RequestListenerService(name: String, localAddress: String, localAkkaMessag
       sender ! HttpResponse(entity = HttpEntity(`application/json`, """{ received : """ + value + """}"""))
 
     //USER REGISTRATION
-      //Register single user to akka server
+    //Register single user to akka server
     case HttpRequest(POST, Uri.Path(path), header, entity, protocol) if path startsWith "/registeruser" =>
       val args: Array[String] = path.split("/")
       val userName = args(2)
@@ -53,7 +53,7 @@ class RequestListenerService(name: String, localAddress: String, localAkkaMessag
 
     case Complete(requestUUID: String) =>
       requestMap.remove(requestUUID).get ! HttpResponse()
-      
+
     //Register multiple users to akka server
     case HttpRequest(POST, Uri.Path(path), header, entity, protocol) if path startsWith "/userregistration" =>
       val payloadMap = entity.asString.asJson.convertTo[scala.collection.immutable.Map[String, String]]
