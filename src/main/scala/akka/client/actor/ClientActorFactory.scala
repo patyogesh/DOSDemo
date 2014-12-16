@@ -17,7 +17,7 @@ class ClientActorFactory(clients: Int, serverAddress: String, followers: Array[I
   }
   
   import context.dispatcher
-  val tweet = context.system.scheduler.scheduleOnce(5000 milliseconds, self, Start)
+  val tweet = context.system.scheduler.scheduleOnce(5000 milliseconds, self, Start("start"))
 
   def receive = {
       case Start(requestUUID : String) =>
