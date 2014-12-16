@@ -62,8 +62,8 @@ class TimelineService(loadMonitor: ActorRef, userProfilesMap: Map[String, UserPr
       }
       load += tweets.size
       requestCount += 1
-      val client = context.actorSelection(requestActorPath)
-      client ! new LoadHomeTimelineResp(requestUUID, tweets)
+      //val client = context.actorSelection(requestActorPath)
+      //client ! new LoadHomeTimelineResp(requestUUID, tweets)
     } catch {
       case e: java.util.NoSuchElementException => //Ignore for Unregistered User println("Username : " + userName)
     }
@@ -81,8 +81,8 @@ class TimelineService(loadMonitor: ActorRef, userProfilesMap: Map[String, UserPr
       }
       load += tweets.size
       requestCount += 1
-      val client = context.actorSelection(requestActorPath)
-      client ! new LoadUserTimelineResp(requestUUID, tweets)
+      //val client = context.actorSelection(requestActorPath)
+      //client ! new LoadUserTimelineResp(requestUUID, tweets)
     } catch {
       case e: java.util.NoSuchElementException => //Ignore for Unregistered User println("Username : " + userName)
     }

@@ -102,8 +102,8 @@ class TweetsService(loadMonitor: ActorRef, userProfilesMap: Map[String, UserProf
       load += userProfile.followers.length + 2
       requestCount += 1
       //Send Response      
-      val ref = context.actorSelection(requestActorPath)
-      ref ! PostUpdateResponse(requestUUID)
+      //val ref = context.actorSelection(requestActorPath)
+      //ref ! PostUpdateResponse(requestUUID)
     } catch {
       case e: java.util.NoSuchElementException => //Ignore for Unregistered User println("Username : " + userName)
     }

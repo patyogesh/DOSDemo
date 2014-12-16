@@ -34,9 +34,8 @@ class SprayClientActor(serverAddress: String, followers: Int, tweetsPerDay: Int,
       val userTimelineTimeout = ((24 * 3600) / (1 * timeMultiplier))
       val userTimeline = context.system.scheduler.schedule((offset / 1) * 1000 milliseconds, userTimelineTimeout * 1000 milliseconds, self, LoadUserTimelineReq)
     case TweetToServer =>
-      println("Tweet")
       for {
-        response <- IO(Http).ask(HttpRequest(method = POST, uri = Uri(s"http://$serverAddress/tweet/update/"+ name), entity = HttpEntity(`application/json`, """{ "text" : """" + getRandomText + """"}"""))).mapTo[HttpResponse]
+        response <- IO(Http).ask(HttpRequest(method = POST, uri = Uri(s"http://$serverAddress/tweet/update/"+ name + "?tweet=" + getRandomText), entity = HttpEntity(`application/json`, """{ "text" : """" + getRandomText + """"}"""))).mapTo[HttpResponse]
         _ <- IO(Http) ? Http.CloseAll
       } yield {
         //Stach tweet update
@@ -62,7 +61,7 @@ class SprayClientActor(serverAddress: String, followers: Int, tweetsPerDay: Int,
   //Generate random String for tweet text
   def getRandomText(): String = {
     val random = new scala.util.Random
-    val length: Int = random.nextInt(120) + 20 //min 20 chars, max 140 chars
+    val length: Int = random.nextInt(20) + 20 //min 20 chars, max 40 chars
     val sb = new StringBuilder
     for (i <- 1 to length) {
       //ASCII value 65 to 90 are printable characters

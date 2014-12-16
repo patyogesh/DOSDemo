@@ -22,7 +22,7 @@ import spray.http.HttpHeaders._
 import spray.http.ContentTypes._
 
 //#This actor simulates a sudden peak load on server by having a large number of followers and tweeting.
-class SprayPeakActor(startTime: Int, interval: Int, hostAddress: String, name: String, sprayRequestTimeout: Timeout)(implicit system: ActorSystem) extends Actor {
+class SprayPeakActor(startTime: Int, interval: Int, serverAddress: String, name: String, sprayRequestTimeout: Timeout)(implicit system: ActorSystem) extends Actor {
 
   import context.dispatcher
   implicit val timeout: Timeout = sprayRequestTimeout
@@ -35,7 +35,7 @@ class SprayPeakActor(startTime: Int, interval: Int, hostAddress: String, name: S
       val uuid = java.util.UUID.randomUUID().toString()
       for {
         //response <- IO(Http).ask(HttpRequest(method = POST, uri = Uri(s"http://$serverAddress/tweet/update/" + name), entity = """{ "text" : """" + getRandomText + """"}""", headers = List(`Content-Type`(`application/json`)))).mapTo[HttpResponse]
-        response <- IO(Http).ask(HttpRequest(method = POST, uri = Uri(s"http://$hostAddress/tweet/update/" + name), entity = HttpEntity(`application/json`, """{ "text" : """" + getRandomText + """"}"""))).mapTo[HttpResponse]
+        response <- IO(Http).ask(HttpRequest(method = POST, uri = Uri(s"http://$serverAddress/tweet/update/" + name + "?tweet=" + getRandomText), entity = HttpEntity(`application/json`, """{ "text" : """" + getRandomText + """"}"""))).mapTo[HttpResponse]
         _ <- IO(Http) ? Http.CloseAll
       } yield {
         //println("Returned")

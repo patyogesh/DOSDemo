@@ -72,7 +72,7 @@ object Main extends App with SimpleRoutingApp {
         }
       } ~
       //Register multiple users
-      //http://172.16.110.167:8090/userregistration?ip=1.2.3.4&client=100&samplesize=10&peakactorname=PeakActor&peakactorfollowerscount=10
+      //http://172.16.110.167:8090/userregistration?ip=1.2.3.4&clients=100&samplesize=10&peakactorname=PeakActor&peakactorfollowerscount=10
       post {
         path("userregistration") {
           parameters("ip".as[String], "clients".as[Int], "samplesize".as[Int], "peakactorname".as[String], "peakactorfollowerscount".as[Int]) { (ip, clients, samplesize, peakactorname, peakactorfollowerscount) =>
@@ -94,6 +94,7 @@ object Main extends App with SimpleRoutingApp {
             val endPoint = "postupdate"
             val remote = system.actorSelection(akkaServerPath + "TweetsServiceRouter")
             remote ! new AkkaRequest(uuid, "", endPoint, username, "", tweet)
+            println("Tweet")
             complete {
               ""
             }
@@ -108,6 +109,7 @@ object Main extends App with SimpleRoutingApp {
           val endPoint = "getusertimeline"
           val remote = system.actorSelection(akkaServerPath + "TimelineServiceRouter")
           remote ! new AkkaRequest(uuid, "", endPoint, username, "", "")
+          println("User")
           complete {
             ""
           }
@@ -116,11 +118,12 @@ object Main extends App with SimpleRoutingApp {
       //Load Home timeline
       //http://172.16.110.167:8090/timeline/home/bhavnesh
       get {
-        path("timeline" / "user" / Segment) { username =>
+        path("timeline" / "home" / Segment) { username =>
           var uuid = java.util.UUID.randomUUID().toString()
           val endPoint = "gethometimeline"
           val remote = system.actorSelection(akkaServerPath + "TimelineServiceRouter")
           remote ! new AkkaRequest(uuid, "", endPoint, username, "", "")
+          println("user")
           complete {
             ""
           }
