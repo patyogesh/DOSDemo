@@ -94,7 +94,6 @@ object Main extends App with SimpleRoutingApp {
             val endPoint = "postupdate"
             val remote = system.actorSelection(akkaServerPath + "TweetsServiceRouter")
             remote ! new AkkaRequest(uuid, "", endPoint, username, "", tweet)
-            println("Tweet")
             complete {
               ""
             }
@@ -109,7 +108,6 @@ object Main extends App with SimpleRoutingApp {
           val endPoint = "getusertimeline"
           val remote = system.actorSelection(akkaServerPath + "TimelineServiceRouter")
           remote ! new AkkaRequest(uuid, "", endPoint, username, "", "")
-          println("User")
           complete {
             ""
           }
@@ -123,7 +121,6 @@ object Main extends App with SimpleRoutingApp {
           val endPoint = "gethometimeline"
           val remote = system.actorSelection(akkaServerPath + "TimelineServiceRouter")
           remote ! new AkkaRequest(uuid, "", endPoint, username, "", "")
-          println("user")
           complete {
             ""
           }
