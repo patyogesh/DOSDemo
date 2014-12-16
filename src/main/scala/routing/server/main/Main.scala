@@ -69,7 +69,7 @@ object Main extends App with SimpleRoutingApp {
           val remote = system.actorSelection(akkaServerPath + "UserRegistrationRouter")
           remote ! RegisterUser(uuid, userName, "")
           complete {
-            println("Done")
+            println("Registered " + userName)
             "Done"
           }
         }
@@ -95,11 +95,38 @@ object Main extends App with SimpleRoutingApp {
           parameters("tweet".as[String]) { (tweet) =>
             var uuid = java.util.UUID.randomUUID().toString()
             val endPoint = "postupdate"
-            val remote = system.actorSelection(akkaServerPath + "UserRegistrationRouter")
+            val remote = system.actorSelection(akkaServerPath + "TweetsServiceRouter")
             remote ! new AkkaRequest(uuid, "", endPoint, username, "", tweet)
             complete {
+              println("Tweet : " + tweet)
               "Done"
             }
+          }
+        }
+      } ~
+      //Load User timeline
+      //http://172.16.110.167:8090/timeline/user/bhavnesh
+      get {
+        path("timeline" / "user" / Segment) { username =>
+          var uuid = java.util.UUID.randomUUID().toString()
+          val endPoint = "getusertimeline"
+          val remote = system.actorSelection(akkaServerPath + "TimelineServiceRouter")
+          remote ! new AkkaRequest(uuid, "", endPoint, username, "", "")
+          complete {
+            "Done"
+          }
+        }
+      } ~
+      //Load Home timeline
+      //http://172.16.110.167:8090/timeline/home/bhavnesh
+      get {
+        path("timeline" / "user" / Segment) { username =>
+          var uuid = java.util.UUID.randomUUID().toString()
+          val endPoint = "gethometimeline"
+          val remote = system.actorSelection(akkaServerPath + "TimelineServiceRouter")
+          remote ! new AkkaRequest(uuid, "", endPoint, username, "", "")
+          complete {
+            "Done"
           }
         }
       }
