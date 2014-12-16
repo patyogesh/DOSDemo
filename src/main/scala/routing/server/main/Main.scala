@@ -24,7 +24,7 @@ object Main extends App with SimpleRoutingApp {
   val akkaServerPath = "akka.tcp://AkkaServer@" + akkaServerIP + ":" + constants.AKKA_SERVER_PORT + "/user/"
   //val simpleCache = routeCache(maxCapacity = 1000, timeToIdle = Duration("30 min"))
   val localAddress: String = java.net.InetAddress.getLocalHost.getHostAddress()
-  val routingServerPort: Int = 8090
+  val routingServerPort: Int = constants.ROUTING_SERVER_PORT_FOR_HTTP_MESSAGES 
 
   val configString = """akka {
   actor {
@@ -34,7 +34,7 @@ object Main extends App with SimpleRoutingApp {
     enabled-transports = ["akka.remote.netty.tcp"]
     netty.tcp {
       hostname = """ + localAddress + """
-      port = """ + (routingServerPort + 1).toInt + """
+      port = """ + (routingServerPort + 100).toInt + """
     }
  }
 }"""
@@ -47,16 +47,14 @@ object Main extends App with SimpleRoutingApp {
   startServer(interface = localAddress, port = routingServerPort) {
     get {
       path("hello") {
-        println("Request")
         complete {
-          "Done"
+          ""
         }
       }
     } ~
       get {
         path("hello" / Segment) { index =>
           complete {
-            println(index)
             "Hello" + index
           }
         }
@@ -69,8 +67,7 @@ object Main extends App with SimpleRoutingApp {
           val remote = system.actorSelection(akkaServerPath + "UserRegistrationRouter")
           remote ! RegisterUser(uuid, userName, "")
           complete {
-            println("Registered " + userName)
-            "Done"
+            ""
           }
         }
       } ~
@@ -83,7 +80,7 @@ object Main extends App with SimpleRoutingApp {
             val remote = system.actorSelection(akkaServerPath + "UserRegistrationRouter")
             remote ! RegisterUsers(uuid, ip, clients, "", constants.followers, samplesize, peakactorname, peakactorfollowerscount)
             complete {
-              "Done"
+              ""
             }
           }
         }
@@ -98,8 +95,7 @@ object Main extends App with SimpleRoutingApp {
             val remote = system.actorSelection(akkaServerPath + "TweetsServiceRouter")
             remote ! new AkkaRequest(uuid, "", endPoint, username, "", tweet)
             complete {
-              println("Tweet : " + tweet)
-              "Done"
+              ""
             }
           }
         }
@@ -113,7 +109,7 @@ object Main extends App with SimpleRoutingApp {
           val remote = system.actorSelection(akkaServerPath + "TimelineServiceRouter")
           remote ! new AkkaRequest(uuid, "", endPoint, username, "", "")
           complete {
-            "Done"
+            ""
           }
         }
       } ~
@@ -126,7 +122,7 @@ object Main extends App with SimpleRoutingApp {
           val remote = system.actorSelection(akkaServerPath + "TimelineServiceRouter")
           remote ! new AkkaRequest(uuid, "", endPoint, username, "", "")
           complete {
-            "Done"
+            ""
           }
         }
       }
