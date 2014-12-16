@@ -34,6 +34,7 @@ class SprayClientActor(serverAddress: String, followers: Int, tweetsPerDay: Int,
       val userTimelineTimeout = ((24 * 3600) / (1 * timeMultiplier))
       val userTimeline = context.system.scheduler.schedule((offset / 1) * 1000 milliseconds, userTimelineTimeout * 1000 milliseconds, self, LoadUserTimelineReq)
     case TweetToServer =>
+      //println("Tweet : " + serverAddress + "/tweet/update/"+ name + "?tweet=" + getRandomText)
       for {
         response <- IO(Http).ask(HttpRequest(method = POST, uri = Uri(s"http://$serverAddress/tweet/update/"+ name + "?tweet=" + getRandomText), entity = HttpEntity(`application/json`, """{ "text" : """" + getRandomText + """"}"""))).mapTo[HttpResponse]
         _ <- IO(Http) ? Http.CloseAll

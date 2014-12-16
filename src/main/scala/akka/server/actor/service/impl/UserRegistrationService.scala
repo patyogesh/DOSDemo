@@ -81,8 +81,9 @@ class UserRegistrationService(count: Int, loadMonitor: ActorRef, userProfilesMap
       job.remainingJobs -= 1
       usersRegistered += job.jobSize
       if (job.remainingJobs == 0) {
-        val factory = context.actorSelection(job.clientFactoryPath)
-        factory ! Start(job.requestUUID)
+        //send response message for registration complete
+        //val factory = context.actorSelection(job.clientFactoryPath)
+        //factory ! Start(job.requestUUID)
       }
     case UpdateRegisteredUserCount =>
       loadMonitor ! UserCount(usersRegistered)
